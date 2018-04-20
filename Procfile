@@ -1,1 +1,1 @@
-web: gunicorn docMS.wsgi --log-file -
+web: gunicorn DocMS.wsgi --log-file -

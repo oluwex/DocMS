@@ -33,6 +33,8 @@ class UserCreateSerializer(ModelSerializer):
             'email2',
             'first_name',
             'last_name',
+            'staff',
+            'admin',
             'password1',
             'password2',
         ]
@@ -71,8 +73,11 @@ class UserCreateSerializer(ModelSerializer):
         password = validated_data['password1']
         first_name = validated_data['first_name']
         last_name = validated_data['last_name']
+        admin = validated_data['admin']
+        staff = validated_data['staff']
 
-        new_user = User(email=email, username=username, first_name=first_name, last_name = last_name)
+        new_user = User(email=email, username=username, first_name=first_name, last_name = last_name
+                        , admin=admin, staff=staff)
         new_user.set_password(password)
         new_user.save()
         return validated_data
