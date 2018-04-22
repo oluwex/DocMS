@@ -13,6 +13,7 @@ from rest_framework.permissions import (
 
 from .serializers import (
     UserCreateSerializer,
+    UserStaffAdminCreateSerializer,
     UserDetailSerializer,
     UserDeleteSerializer,
     UserLoginSerializer,
@@ -29,6 +30,12 @@ class UserCreateAPIView(CreateAPIView):
     permission_classes = [AllowAny, ]
 
 
+class UserStaffAdminCreateAPIView(CreateAPIView):
+    serializer_class = UserStaffAdminCreateSerializer
+    queryset = User.objects.all()
+    permission_classes = [IsAdminUser, ]
+
+
 class UserDetailAPIView(RetrieveUpdateAPIView):
     serializer_class = UserDetailSerializer
     queryset = User.objects.all()
@@ -42,7 +49,7 @@ class UserDeleteAPIView(DestroyAPIView):
 
 
 class UserLoginAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny, ]
     serializer_class = UserLoginSerializer
 
     def post(self, request, *args, **kwargs):

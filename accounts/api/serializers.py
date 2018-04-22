@@ -33,8 +33,6 @@ class UserCreateSerializer(ModelSerializer):
             'email2',
             'first_name',
             'last_name',
-            'staff',
-            'admin',
             'password1',
             'password2',
         ]
@@ -66,6 +64,62 @@ class UserCreateSerializer(ModelSerializer):
             raise ValidationError("Passwords do not match")
         return value
 
+    def create(self, validated_data):
+        username = validated_data['username']
+        email = validated_data["email"]
+        password = validated_data['password1']
+        first_name = validated_data['first_name']
+        last_name = validated_data['last_name']
+        new_user = User(email=email, username=username, first_name=first_name, last_name = last_name)
+        new_user.set_password(password)
+        new_user.save()
+        return validated_data
+
+
+class UserStaffAdminCreateSerializer(ModelSerializer):
+    email2 = EmailField(label='Confirm email')
+    password1 = CharField(
+        label='Password',
+        min_length=6,
+        write_only=True
+    )
+    password2 = CharField(
+        label='Confirm password',
+        min_length=6,
+        write_only=True
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'email',
+            'email2',
+            'first_name',
+            'last_name'
+            'admin'
+            'password1',
+            'password2',
+        ]
+
+    def validate_email(self, value):
+        data = self.get_initial()
+        email1 = data['email2']
+        email2 = value
+        if email1 != email2:
+            raise ValidationError('Emails do not match')
+        prev_user = User.objects.filter(email=email1)
+        if prev_user:
+            raise ValidationError("This user already exists.")
+        return value
+
+    def validate_password1(self, value):
+        data = self.get_initial()
+        password2 = data['password2']
+        password1 = value
+        if password1 != password2:
+            raise ValidationError("Passwords do not match")
+        return value
 
     def create(self, validated_data):
         username = validated_data['username']
@@ -74,10 +128,8 @@ class UserCreateSerializer(ModelSerializer):
         first_name = validated_data['first_name']
         last_name = validated_data['last_name']
         admin = validated_data['admin']
-        staff = validated_data['staff']
-
-        new_user = User(email=email, username=username, first_name=first_name, last_name = last_name
-                        , admin=admin, staff=staff)
+        new_user = User(email=email, username=username, first_name=first_name, last_name=last_name,
+                        admin=admin, staff=True)
         new_user.set_password(password)
         new_user.save()
         return validated_data
