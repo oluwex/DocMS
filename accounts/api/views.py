@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 
-from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, DestroyAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, DestroyAPIView, UpdateAPIView
 
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
@@ -17,6 +17,7 @@ from .serializers import (
     UserDetailSerializer,
     UserDeleteSerializer,
     UserLoginSerializer,
+    UserChangePasswordSerializer,
 )
 
 from .permissions import IsOwnProfileOrAdmin
@@ -40,12 +41,21 @@ class UserDetailAPIView(RetrieveUpdateAPIView):
     serializer_class = UserDetailSerializer
     queryset = User.objects.all()
     permission_classes = [IsOwnProfileOrAdmin, ]
+    lookup_field = 'username'
 
 
 class UserDeleteAPIView(DestroyAPIView):
     serializer_class = UserDeleteSerializer
     queryset = User.objects.all()
     permission_classes = [IsAdminUser, ]
+    lookup_field = 'username'
+
+
+class UserChangePasswordAPIView(UpdateAPIView):
+    serializer_class = UserChangePasswordSerializer
+    queryset = User.objects.all()
+    permission_classes = [IsOwnProfileOrAdmin, ]
+    lookup_field = 'username'
 
 
 class UserLoginAPIView(APIView):

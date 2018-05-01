@@ -27,7 +27,8 @@ urlpatterns = [
     # API Urls
 	url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^api-token-auth/', views.obtain_auth_token),
-    url(r'api/users/', include("accounts.api.urls", namespace='users-api')),
+    url(r'^api/users/', include("accounts.api.urls", namespace='users-api')),
+    url(r'^api/documents/', include("documents.api.urls", namespace='documents-api'))
 ]
 
 if settings.DEBUG:

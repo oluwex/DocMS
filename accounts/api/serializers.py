@@ -78,15 +78,17 @@ class UserCreateSerializer(ModelSerializer):
 
 class UserStaffAdminCreateSerializer(ModelSerializer):
     email2 = EmailField(label='Confirm email')
+
     password1 = CharField(
         label='Password',
         min_length=6,
-        write_only=True
+        write_only=True,
     )
+
     password2 = CharField(
         label='Confirm password',
         min_length=6,
-        write_only=True
+        write_only=True,
     )
 
     class Meta:
@@ -96,8 +98,8 @@ class UserStaffAdminCreateSerializer(ModelSerializer):
             'email',
             'email2',
             'first_name',
-            'last_name'
-            'admin'
+            'last_name',
+            'admin',
             'password1',
             'password2',
         ]
@@ -151,6 +153,61 @@ class UserDeleteSerializer(ModelSerializer):
         model = User
 
 
+class UserChangePasswordSerializer(ModelSerializer):
+
+    password = CharField(
+        label='Old Password',
+        min_length=6,
+        write_only=True
+    )
+
+    password1 = CharField(
+        label='New Password',
+        min_length=6,
+        write_only=True
+    )
+    password2 = CharField(
+        label='Confirm password',
+        min_length=6,
+        write_only=True
+    )
+
+    message = CharField(
+        read_only=True
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            'password',
+            'password1',
+            'password2',
+            'message',
+        ]
+
+    def validate_password1(self, value):
+        data = self.get_initial()
+        password2 = data['password2']
+        password1 = value
+        if password1 != password2:
+            raise ValidationError("Passwords do not match")
+        return value
+
+    def update(self, instance, validated_data):
+        user_obj = instance
+
+        old_password = validated_data['password']
+
+        if not user_obj.check_password(old_password):
+            raise ValidationError("Old password incorrect.")
+
+        new_password = validated_data['password1']
+        user_obj.set_password(new_password)
+        user_obj.save()
+        validated_data['message'] = "Password successfully changed."
+        return validated_data
+
+
 class UserLoginSerializer(ModelSerializer):
     token = CharField(allow_blank=True, read_only=True)
     username = CharField(required=False, allow_blank=True)
@@ -169,7 +226,6 @@ class UserLoginSerializer(ModelSerializer):
 
     def validate(self, data):
         user_obj = None
-        print(data)
         username = data.get('username', None)
         email = data.get('email', None)
         password = data["password"]

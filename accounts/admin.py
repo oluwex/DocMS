@@ -13,12 +13,12 @@ class UserAdmin(BaseUserAdmin):
 	form = UserAdminChangeForm
 	add_form = UserAdminCreationForm
 
-	list_display = ('email', 'first_name', 'last_name', 'admin')
+	list_display = ('email', 'username', 'first_name', 'last_name', 'admin')
 	list_filter = ('admin',)
 	fieldsets = (
-		(None, {'fields': ('email', 'username', 'password')}),
+		(None, {'fields': ('email', 'username', 'password', 'active')}),
 		('Personal info', {'fields': ('first_name', 'last_name')}),
-		('Permissions', {'fields': ('admin',)}),
+		('Permissions', {'fields': ('staff', 'admin',)}),
 	)
 
 	# add_fieldsets to override by UserAdmin
